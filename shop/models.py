@@ -18,5 +18,6 @@ class Animal(models.Model):
     def age(self):
         return int((date.today() - self.birthday).days // 365.2425)
 
+
     def __str__(self):
         return f'name: {self.name}, age: {self.age}'
