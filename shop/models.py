@@ -11,8 +11,15 @@ class Person(models.Model):
 
 
 class Pet(models.Model):
+    CAT = 'CT'
+    DOG = 'DG'
+    ANIMALS = [
+        (CAT, 'Cat'),
+        (DOG, 'Dog'),
+    ]
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
+    animal = models.CharField(max_length=30, choices=ANIMALS, default=DOG)
     birthday = models.DateField()
 
     @property
@@ -20,4 +27,4 @@ class Pet(models.Model):
         return int((date.today() - self.birthday).days // 365.2425)
 
     def __str__(self):
-        return f'name: {self.name}, age: {self.age} years'
+        return f'{self.animal} name: {self.name}, age: {self.age} years'
