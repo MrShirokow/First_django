@@ -1,13 +1,14 @@
 from django.contrib import admin
-from shop.models import Person, Animal
+from shop.models import Person, Pet
 
 
 class PersonAdmin(admin.ModelAdmin):
     pass
 
-class AnimalAdmin(admin.ModelAdmin):
+
+class PetAdmin(admin.ModelAdmin):
     pass
 
 
 admin.site.register(Person, PersonAdmin)
-admin.site.register(Animal, AnimalAdmin)
+admin.site.register(Pet, PetAdmin)
