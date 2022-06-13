@@ -15,7 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from skyeng.views import *
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('themes', ThemeView.as_view()),
+    path('levels', LevelView.as_view()),
+    path('categories', CategoryView.as_view()),
 ]

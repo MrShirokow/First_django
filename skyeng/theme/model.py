@@ -14,7 +14,7 @@ class Level(Enum):
 
 class Theme(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    level = models.CharField(max_length=10, choices=[(lev.name, lev.value) for lev in Level], blank=True, null=True)
+    level = models.CharField(max_length=30, choices=[(lev.name, lev.value) for lev in Level], blank=True, null=True)
     title = models.CharField(max_length=50)
 
     def __str__(self):
