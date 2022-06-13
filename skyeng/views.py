@@ -5,37 +5,37 @@ from .theme.model import Theme, Level
 from .word.model import Word
 
 
-class ThemeView(View):
+class ListThemeView(View):
 
     def get(self, request):
         query = request.GET
         category_id = query.get('category')
         level = query.get('level')
-        qs = Theme.objects.all()
+        query_set = Theme.objects.all()
         if category_id:
-            qs = qs.filter(category=category_id)
+            query_set = query_set.filter(category=category_id)
         if level:
-            qs = qs.filter(level=level)
+            query_set = query_set.filter(level=level)
 
         items_data = [{
                 'id': item.id,
                 'category': item.category.id,
                 'level': item.level,
-                'name': item.name} for item in qs]
+                'name': item.name} for item in query_set]
 
         return JsonResponse(items_data, safe=False)
 
 
-class ThemeByIdView(View):
+class ThemeView(View):
     def get(self, request, **kwargs):
         theme_id = kwargs.get('theme_id')
-        item = Theme.objects.get(id=theme_id)
-        words = Word.objects.filter(theme=theme_id)
+        theme = Theme.objects.get(id=theme_id)
+        words = theme.words.all()
         item_data = {
-            'id': item.id,
-            'category': item.category.id,
-            'level': item.level,
-            'name': item.name,
+            'id': theme.id,
+            'category': theme.category.id,
+            'level': theme.level,
+            'name': theme.name,
             'words': [{'id': w.id,
                        'word': w.name} for w in words]
         }
@@ -56,10 +56,11 @@ class LevelView(View):
 class CategoryView(View):
 
     def get(self, request):
-        qs = Category.objects.all()
+        query_set = Category.objects.all()
         items_data = [{
                 'id': item.id,
-                'name': item.name} for item in qs]
+                'name': item.name,
+                'icon': request.build_absolute_uri(item.icon.url)} for item in query_set]
 
         return JsonResponse(items_data, safe=False)
 
@@ -68,13 +69,13 @@ class WordView(View):
 
     def get(self, request, **kwargs):
         word_id = kwargs.get('word_id')
-        item = Word.objects.get(id=word_id)
+        word = Word.objects.get(id=word_id)
         item_data = {
-            'id': item.id,
-            'name': item.name,
-            'transcription': item.transcription,
-            'translation': item.translation,
-            'example': item.example,
+            'id': word.id,
+            'name': word.name,
+            'transcription': word.transcription,
+            'translation': word.translation,
+            'example': word.example,
         }
 
         return JsonResponse(item_data)

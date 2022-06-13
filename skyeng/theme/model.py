@@ -13,13 +13,14 @@ class Level(Enum):
 
 
 class Theme(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='themes')
     level = models.CharField(max_length=30, choices=[(lev.value, lev.value) for lev in Level], blank=True, null=True)
     name = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
-        return f'Theme: {self.name}'
+        return f'theme: {self.name}'
 
     class Meta:
         verbose_name = 'Theme'
         verbose_name_plural = 'Themes'
+        ordering = ['name']

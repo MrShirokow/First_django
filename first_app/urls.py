@@ -16,13 +16,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from skyeng.views import *
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('themes/', ThemeView.as_view()),
-    path('themes/<int:theme_id>', ThemeByIdView.as_view()),
+    path('themes/', ListThemeView.as_view()),
+    path('themes/<int:theme_id>', ThemeView.as_view()),
     path('levels/', LevelView.as_view()),
     path('categories/', CategoryView.as_view()),
     path('words/<int:word_id>/', WordView.as_view()),
-]
+] # + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+print(static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
