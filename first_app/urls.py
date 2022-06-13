@@ -20,8 +20,9 @@ from skyeng.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('themes', ThemeView.as_view()),
-    path('levels', LevelView.as_view()),
-    path('categories', CategoryView.as_view()),
-    path('words', WordView.as_view()),
+    path('themes/', ThemeView.as_view()),
+    path('themes/<int:theme_id>', ThemeByIdView.as_view()),
+    path('levels/', LevelView.as_view()),
+    path('categories/', CategoryView.as_view()),
+    path('words/<int:word_id>/', WordView.as_view()),
 ]
