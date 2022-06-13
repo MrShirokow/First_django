@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Category(models.Model):
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=50, null=True, blank=True)
     icon = models.ImageField(upload_to='uploads/', blank=True, null=True)
 
     def __str__(self):

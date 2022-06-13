@@ -23,4 +23,5 @@ urlpatterns = [
     path('themes', ThemeView.as_view()),
     path('levels', LevelView.as_view()),
     path('categories', CategoryView.as_view()),
+    path('words', WordView.as_view()),
 ]

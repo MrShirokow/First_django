@@ -10,55 +10,48 @@ class ThemeView(View):
 
     def get(self, request):
         qs = Theme.objects.all()
-        items_data = []
-
-        for item in qs:
-            items_data.append({
+        items_data = [{
                 'id': item.id,
                 'category': item.category.id,
                 'level': item.level,
-                'name': item.title,
-            })
-        data = {
-            'items': items_data,
-        }
-        return JsonResponse(data)
+                'name': item.title,} for item in qs]
+
+        return JsonResponse(items_data, safe=False)
 
 
 class LevelView(View):
 
     def get(self, request):
-        items_data = []
-
-        for item in Level:
-            items_data.append({
+        items_data = [{
                 'name': item.value,
-                'code': item.name,
-            })
-        data = {
-            'items': items_data,
-        }
-        return JsonResponse(data)
+                'code': item.name,} for item in Level]
+
+        return JsonResponse(items_data, safe=False)
 
 
 class CategoryView(View):
 
     def get(self, request):
         qs = Category.objects.all()
-        items_data = []
-
-        for item in qs:
-            items_data.append({
+        items_data = [{
                 'id': item.id,
-                'name': item.title,
-            })
-        data = {
-            'items': items_data,
-        }
-        return JsonResponse(data)
+                'name': item.title,} for item in qs]
+
+        return JsonResponse(items_data, safe=False)
 
 
 class WordView(View):
 
     def get(self, request):
-        pass
+        # Need change method to get word by id
+
+        item = Word.objects.get(id=2)
+        items_data = [{
+            'id': item.id,
+            'word': item.word,
+            'transcription': item.transcription,
+            'translation': item.translation,
+            'example': item.example,
+        }]
+
+        return JsonResponse(items_data[0])

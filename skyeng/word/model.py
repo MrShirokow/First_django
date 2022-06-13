@@ -4,10 +4,10 @@ from skyeng.theme.model import Theme
 
 class Word(models.Model):
     theme = models.ForeignKey(Theme, on_delete=models.CASCADE)
-    word = models.CharField(max_length=200)
-    # transcription = models.CharField(max_length=200)
-    # translation = models.CharField(max_length=200)
-    # example = models.TextField()
+    word = models.CharField(max_length=200, null=True, blank=True)
+    transcription = models.CharField(max_length=200, null=True, blank=True)
+    translation = models.CharField(max_length=200, null=True, blank=True)
+    example = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.word}'
