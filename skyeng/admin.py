@@ -4,7 +4,7 @@ from skyeng.models import Category, Theme, Word
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'icon', 'icon_preview')
+    list_display = ('id', 'name', 'icon_preview')
     readonly_fields = ('icon_preview',)
     list_display_links = ('id', 'name')
 
@@ -17,7 +17,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Theme)
 class ThemeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'level', 'category', 'photo', 'photo_preview')
+    list_display = ('id', 'name', 'level', 'category', 'photo_preview')
     readonly_fields = ('photo_preview',)
     list_display_links = ('id', 'name')
 

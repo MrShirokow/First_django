@@ -3,12 +3,17 @@ from django.http import JsonResponse
 from .category.model import Category
 from .theme.model import Theme, Level
 from .word.model import Word
+from django.http import HttpResponseNotFound
 
 
 class ListThemeView(View):
 
     def get(self, request):
         query = request.GET
+        for key in query:
+            if key != 'category' and key != 'level':
+                return HttpResponseNotFound('Not found')
+
         category_id = query.get('category')
         level = query.get('level')
         query_set = Theme.objects.all()
@@ -31,7 +36,10 @@ class ListThemeView(View):
 class ThemeView(View):
     def get(self, request, **kwargs):
         theme_id = kwargs.get('theme_id')
-        theme = Theme.objects.get(id=theme_id)
+        theme = Theme.objects.filter(id=theme_id).first()
+        if not theme:
+            return HttpResponseNotFound('Not found')
+
         words = theme.words.all()
         item_data = {
             'id': theme.id,
@@ -49,6 +57,10 @@ class ThemeView(View):
 class LevelView(View):
 
     def get(self, request):
+        query = request.GET
+        if query:
+            return HttpResponseNotFound('Not found')
+
         items_data = [{
                 'name': item.value,
                 'code': item.name} for item in Level
@@ -58,8 +70,11 @@ class LevelView(View):
 
 
 class CategoryView(View):
-
     def get(self, request):
+        query = request.GET
+        if query:
+            return HttpResponseNotFound('Not found')
+
         query_set = Category.objects.all()
         items_data = [{
                 'id': item.id,
@@ -74,7 +89,9 @@ class WordView(View):
 
     def get(self, request, **kwargs):
         word_id = kwargs.get('word_id')
-        word = Word.objects.get(id=word_id)
+        word = Word.objects.filter(id=word_id).first()
+        if not word:
+            return HttpResponseNotFound('Not found')
         item_data = {
             'id': word.id,
             'name': word.name,
