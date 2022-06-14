@@ -26,6 +26,7 @@ wheels/
 MANIFEST
 images/
 media/
+audio/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

@@ -7,7 +7,7 @@ class Category(models.Model):
     icon = models.ImageField(upload_to='images/', null=True)
 
     def __str__(self):
-        return f'category: {self.name}'
+        return f'{self.name}'
 
     @property
     def icon_preview(self):

@@ -81,6 +81,7 @@ class WordView(View):
             'transcription': word.transcription,
             'translation': word.translation,
             'example': word.example,
+            'sound': request.build_absolute_uri(word.sound.url)
         }
 
         return JsonResponse(item_data)
