@@ -15,4 +15,4 @@ class Word(models.Model):
     class Meta:
         verbose_name = 'Word'
         verbose_name_plural = 'Words'
-        ordering = ['name']
+        ordering = ['id']

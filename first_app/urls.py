@@ -27,6 +27,4 @@ urlpatterns = [
     path('levels/', LevelView.as_view()),
     path('categories/', CategoryView.as_view()),
     path('words/<int:word_id>/', WordView.as_view()),
-] # + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-print(static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
+]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

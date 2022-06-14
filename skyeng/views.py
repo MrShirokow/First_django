@@ -21,7 +21,9 @@ class ListThemeView(View):
                 'id': item.id,
                 'category': item.category.id,
                 'level': item.level,
-                'name': item.name} for item in query_set]
+                'name': item.name,
+                'photo': request.build_absolute_uri(item.photo.url)} for item in query_set
+        ]
 
         return JsonResponse(items_data, safe=False)
 
@@ -36,6 +38,7 @@ class ThemeView(View):
             'category': theme.category.id,
             'level': theme.level,
             'name': theme.name,
+            'photo': request.build_absolute_uri(theme.photo.url),
             'words': [{'id': w.id,
                        'word': w.name} for w in words]
         }
@@ -48,7 +51,8 @@ class LevelView(View):
     def get(self, request):
         items_data = [{
                 'name': item.value,
-                'code': item.name} for item in Level]
+                'code': item.name} for item in Level
+        ]
 
         return JsonResponse(items_data, safe=False)
 
@@ -60,7 +64,8 @@ class CategoryView(View):
         items_data = [{
                 'id': item.id,
                 'name': item.name,
-                'icon': request.build_absolute_uri(item.icon.url)} for item in query_set]
+                'icon': request.build_absolute_uri(item.icon.url)} for item in query_set
+        ]
 
         return JsonResponse(items_data, safe=False)
 
