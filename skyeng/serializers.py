@@ -3,7 +3,7 @@ Model's serializers
 """
 
 
-def serialize_category(request, query_set):
+def serialize_category_list(request, query_set):
     items_data = [{
         'id': item.id,
         'name': item.name,

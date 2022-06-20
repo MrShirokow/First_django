@@ -1,42 +1,38 @@
 from django.views import View
-from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden
+from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
 from .category.model import Category
 from .theme.model import Theme, Level
 from .word.model import Word
-from .serializers import serialize_category, serialize_level, serialize_word, serialize_theme, serialize_theme_list
+from .serializers import serialize_category_list, serialize_level, serialize_word, serialize_theme, serialize_theme_list
 from first_app.settings import API_SECRET
 
 
 def check_correct_api_secret(request):
-    secret = request.META.get('HTTP_SECRET')
+    secret = request.headers.get('SECRET')
     return API_SECRET == secret
 
 
-def get_offset_and_limit(query_params, items_count):
-    offset = query_params.get('offset')
-    limit = query_params.get('limit')
-    offset = int(offset) if offset else 0
-    limit = int(limit) + offset if limit else items_count
+def paginate(query_params, query_set):
+    offset = int(query_params.get('offset', 0))
+    limit = int(query_params.get('limit', 50))
 
-    return offset, limit
+    return query_set[offset:limit]
 
 
-class CategoryView(View):
+class CategoryListView(View):
 
     def get(self, request):
         if not check_correct_api_secret(request):
             return HttpResponseForbidden('Unknown API key')
 
+        query_set = Category.objects.all()
         query_params = request.GET
-        items_count = Category.objects.count()
-        offset, limit = get_offset_and_limit(query_params, items_count)
-        query_set = Category.objects.all()[offset:limit]
-
-        items_data = serialize_category(request, query_set)
+        query_set = paginate(query_params, query_set)
+        items_data = serialize_category_list(request, query_set)
         return JsonResponse(items_data, safe=False)
 
 
-class ListThemeView(View):
+class ThemeListView(View):
 
     def get(self, request):
         if not check_correct_api_secret(request):
@@ -51,15 +47,12 @@ class ListThemeView(View):
         if level:
             query_set = query_set.filter(level=level)
 
-        items_count = query_set.count()
-        offset, limit = get_offset_and_limit(query_params, items_count)
-        query_set = query_set[offset:limit]
-
+        query_set = paginate(query_params, query_set)
         items_data = serialize_theme_list(request, query_set)
         return JsonResponse(items_data, safe=False)
 
 
-class ThemeView(View):
+class ThemeDetailView(View):
 
     def get(self, request, theme_id):
         if not check_correct_api_secret(request):
@@ -74,7 +67,7 @@ class ThemeView(View):
         return JsonResponse(item_data, safe=False)
 
 
-class LevelView(View):
+class LevelDetailView(View):
 
     def get(self, request):
         if not check_correct_api_secret(request):
@@ -84,7 +77,7 @@ class LevelView(View):
         return JsonResponse(items_data, safe=False)
 
 
-class WordView(View):
+class WordDetailView(View):
 
     def get(self, request, word_id):
         if not check_correct_api_secret(request):
