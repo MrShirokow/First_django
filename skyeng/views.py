@@ -25,9 +25,9 @@ class ListThemeView(View):
 
         offset = query_params.get('offset')
         limit = query_params.get('limit')
-        item_count = Theme.objects.count()
+        items_count = query_set.count()
         offset = int(offset if offset else 0)
-        limit = int(limit) + offset if limit else item_count
+        limit = int(limit) + offset if limit else items_count
         query_set = query_set[offset:limit]
 
         items_data = serialize_theme_list(request, query_set)
@@ -73,9 +73,9 @@ class CategoryView(View):
 
         offset = query_params.get('offset')
         limit = query_params.get('limit')
-        item_count = Category.objects.count()
+        items_count = Category.objects.count()
         offset = int(offset if offset else 0)
-        limit = int(limit) + offset if limit else item_count
+        limit = int(limit) + offset if limit else items_count
 
         query_set = Category.objects.all()[offset:limit]
         items_data = serialize_category(request, query_set)
