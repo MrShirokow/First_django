@@ -1,5 +1,6 @@
 from django.views import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
+from rest_framework.exceptions import ValidationError
 from .category.model import Category
 from .theme.model import Theme, Level
 from .word.model import Word
@@ -13,9 +14,11 @@ def check_correct_api_secret(request):
 
 
 def paginate(query_params, query_set):
+    count = query_set.count()
     offset = int(query_params.get('offset', 0))
     limit = int(query_params.get('limit', 50))
-
+    if limit > 100 or limit < 0 or offset < 0 or offset >= count:
+        print('Hello')
     return query_set[offset:limit]
 
 
@@ -30,6 +33,12 @@ class CategoryListView(View):
         query_set = paginate(query_params, query_set)
         items_data = serialize_category_list(request, query_set)
         return JsonResponse(items_data, safe=False)
+
+    def post(self, request):
+        name = request.POST.get('name')
+        Category.objects.create(name=name)
+
+        return HttpResponse(200)
 
 
 class ThemeListView(View):
