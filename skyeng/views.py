@@ -1,6 +1,5 @@
 from django.views import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
-from rest_framework.exceptions import ValidationError
 from .category.model import Category
 from .theme.model import Theme, Level
 from .word.model import Word
@@ -18,8 +17,8 @@ def paginate(query_params, query_set):
     offset = int(query_params.get('offset', 0))
     limit = int(query_params.get('limit', 50))
     if limit > 100 or limit < 0 or offset < 0 or offset >= count:
-        print('Hello')
-    return query_set[offset:limit]
+        pass
+    return query_set[offset:offset + limit]
 
 
 class CategoryListView(View):
@@ -35,9 +34,9 @@ class CategoryListView(View):
         return JsonResponse(items_data, safe=False)
 
     def post(self, request):
-        name = request.POST.get('name')
+        query_params = request.POST
+        name = query_params.get('name')
         Category.objects.create(name=name)
-
         return HttpResponse(200)
 
 
@@ -69,7 +68,7 @@ class ThemeDetailView(View):
 
         theme = Theme.objects.filter(id=theme_id).first()
         if not theme:
-            return HttpResponseNotFound(f'Theme with id {theme_id} not found')
+            return HttpResponseNotFound(f'Theme with id={theme_id} not found')
 
         words = theme.words.all()
         item_data = serialize_theme(request, theme, words)
@@ -94,7 +93,7 @@ class WordDetailView(View):
 
         word = Word.objects.filter(id=word_id).first()
         if not word:
-            return HttpResponseNotFound(f'Word with id {word_id} not found')
+            return HttpResponseNotFound(f'Word with id={word_id} not found')
 
         item_data = serialize_word(request, word)
         return JsonResponse(item_data)
