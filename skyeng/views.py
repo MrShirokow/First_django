@@ -3,7 +3,9 @@ from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidde
 from .category.form import CategoryForm
 from .category.model import Category
 from .theme.model import Theme, Level
+from .theme.form import ThemeForm
 from .word.model import Word
+from .word.form import WordForm
 from .serializers import serialize_category_list, serialize_level, serialize_word, serialize_theme, serialize_theme_list
 from first_app.settings import API_SECRET
 
@@ -34,7 +36,7 @@ class CategoryListView(View):
         query_params = request.GET
         query_set = paginate(query_params, query_set)
         if not query_set:
-            return HttpResponse('Incorrect limit or offset value', status=422)
+            return HttpResponse('Invalid limit or offset value', status=422)
 
         items_data = serialize_category_list(request, query_set)
         return JsonResponse(items_data, safe=False)
@@ -42,7 +44,7 @@ class CategoryListView(View):
     @api_secret_check
     def post(self, request):
         category_form = CategoryForm(request.GET)
-        print(category_form.is_valid())
+        # print(category_form.is_valid())
         if category_form.is_valid():
             pass
             # name = query_params.get('name')
@@ -68,8 +70,19 @@ class ThemeListView(View):
             query_set = query_set.filter(level=level)
 
         query_set = paginate(query_params, query_set)
+        if not query_set:
+            return HttpResponse('Invalid limit or offset value', status=422)
+
         items_data = serialize_theme_list(request, query_set)
         return JsonResponse(items_data, safe=False)
+
+    @api_secret_check
+    def post(self, request):
+        theme_form = ThemeForm(request.GET)
+        if theme_form.is_valid():
+            pass
+
+        return HttpResponse('Success', status=201)
 
 
 class ThemeDetailView(View):
@@ -103,3 +116,11 @@ class WordDetailView(View):
 
         item_data = serialize_word(request, word)
         return JsonResponse(item_data)
+
+    @api_secret_check
+    def post(self, request):
+        word_form = WordForm(request.GET)
+        if word_form.is_valid():
+            pass
+
+        return HttpResponse('Success', status=201)
