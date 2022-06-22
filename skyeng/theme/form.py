@@ -2,7 +2,7 @@ from django.forms import ModelForm
 from model import Theme
 
 
-class CategoryForm(ModelForm):
+class ThemeForm(ModelForm):
 
     class Meta:
         model = Theme

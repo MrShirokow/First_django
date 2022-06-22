@@ -1,5 +1,6 @@
 from django.views import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
+from .category.form import CategoryForm
 from .category.model import Category
 from .theme.model import Theme, Level
 from .word.model import Word
@@ -7,9 +8,13 @@ from .serializers import serialize_category_list, serialize_level, serialize_wor
 from first_app.settings import API_SECRET
 
 
-def check_correct_api_secret(request):
-    secret = request.headers.get('SECRET')
-    return API_SECRET == secret
+def api_secret_check(request_function):
+    def wrapper(self, request, *args, **kwargs):
+        secret = request.headers.get('SECRET')
+        if API_SECRET != secret:
+            return HttpResponseForbidden('Unknown API key')
+        return request_function(self, request, *args, **kwargs)
+    return wrapper
 
 
 def paginate(query_params, query_set):
@@ -23,29 +28,33 @@ def paginate(query_params, query_set):
 
 class CategoryListView(View):
 
+    @api_secret_check
     def get(self, request):
-        if not check_correct_api_secret(request):
-            return HttpResponseForbidden('Unknown API key')
-
         query_set = Category.objects.all()
         query_params = request.GET
         query_set = paginate(query_params, query_set)
         items_data = serialize_category_list(request, query_set)
         return JsonResponse(items_data, safe=False)
 
+    @api_secret_check
     def post(self, request):
-        query_params = request.POST
-        name = query_params.get('name')
-        Category.objects.create(name=name)
-        return HttpResponse(200)
+        category_form = CategoryForm(request.GET)
+        print(category_form.is_valid())
+        if category_form.is_valid():
+            pass
+            # name = query_params.get('name')
+            # icon_url = query_params.get('icon')
+            # new_category = Category.objects.create(name=name)
+            # new_category.icon = icon_url
+            # new_category.save()
+
+        return HttpResponse('Success', status=201)
 
 
 class ThemeListView(View):
 
+    @api_secret_check
     def get(self, request):
-        if not check_correct_api_secret(request):
-            return HttpResponseForbidden('Unknown API key')
-
         query_params = request.GET
         query_set = Theme.objects.all()
         category_id = query_params.get('category')
@@ -62,10 +71,8 @@ class ThemeListView(View):
 
 class ThemeDetailView(View):
 
+    @api_secret_check
     def get(self, request, theme_id):
-        if not check_correct_api_secret(request):
-            return HttpResponseForbidden('Unknown API key')
-
         theme = Theme.objects.filter(id=theme_id).first()
         if not theme:
             return HttpResponseNotFound(f'Theme with id={theme_id} not found')
@@ -77,20 +84,16 @@ class ThemeDetailView(View):
 
 class LevelDetailView(View):
 
+    @api_secret_check
     def get(self, request):
-        if not check_correct_api_secret(request):
-            return HttpResponseForbidden('Unknown API key')
-
         items_data = serialize_level(Level)
         return JsonResponse(items_data, safe=False)
 
 
 class WordDetailView(View):
 
+    @api_secret_check
     def get(self, request, word_id):
-        if not check_correct_api_secret(request):
-            return HttpResponseForbidden('Unknown API key')
-
         word = Word.objects.filter(id=word_id).first()
         if not word:
             return HttpResponseNotFound(f'Word with id={word_id} not found')

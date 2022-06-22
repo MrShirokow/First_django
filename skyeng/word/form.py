@@ -2,7 +2,7 @@ from django.forms import ModelForm
 from model import Word
 
 
-class CategoryForm(ModelForm):
+class WordForm(ModelForm):
 
     class Meta:
         model = Word
