@@ -9,12 +9,12 @@ from first_app.settings import API_SECRET
 
 
 def api_secret_check(request_function):
-    def wrapper(self, request, *args, **kwargs):
+    def request_wrapper(self, request, *args, **kwargs):
         secret = request.headers.get('SECRET')
         if API_SECRET != secret:
             return HttpResponseForbidden('Unknown API key')
         return request_function(self, request, *args, **kwargs)
-    return wrapper
+    return request_wrapper
 
 
 def paginate(query_params, query_set):
@@ -22,7 +22,7 @@ def paginate(query_params, query_set):
     offset = int(query_params.get('offset', 0))
     limit = int(query_params.get('limit', 50))
     if limit > 100 or limit < 0 or offset < 0 or offset >= count:
-        pass
+        return None
     return query_set[offset:offset + limit]
 
 
@@ -33,6 +33,9 @@ class CategoryListView(View):
         query_set = Category.objects.all()
         query_params = request.GET
         query_set = paginate(query_params, query_set)
+        if not query_set:
+            return HttpResponse('Incorrect limit or offset value', status=422)
+
         items_data = serialize_category_list(request, query_set)
         return JsonResponse(items_data, safe=False)
 

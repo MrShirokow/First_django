@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from model import Word
+from .model import Word
 
 
 class WordForm(ModelForm):
