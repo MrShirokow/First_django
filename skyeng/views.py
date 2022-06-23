@@ -45,16 +45,15 @@ class CategoryListView(View):
 
     @api_secret_check
     def post(self, request):
-        category_form = CategoryForm(request.POST)
+        request_body = request.POST
+        request_files = request.FILES
+        category_form = CategoryForm(request_body, request_files)
         if category_form.is_valid():
-            pass
-            # name = query_params.get('name')
-            # icon_url = query_params.get('icon')
-            # new_category = Category.objects.create(name=name)
-            # new_category.icon = icon_url
-            # new_category.save()
+            name = request_body.get('name')
+            icon = request_files.get('icon')
+            Category.objects.create(name=name, icon=icon)
 
-        return HttpResponse('Success', status=201)
+        return HttpResponse('Creation was successful', status=201)
 
 
 class ThemeListView(View):
@@ -79,7 +78,9 @@ class ThemeListView(View):
 
     @api_secret_check
     def post(self, request):
-        theme_form = ThemeForm(request.POST)
+        request_body = request.POST
+        request_files = request.FILES
+        theme_form = ThemeForm(request_body, request_files)
         if theme_form.is_valid():
             pass
 
@@ -134,7 +135,9 @@ class WordListView(View):
 
     @api_secret_check
     def post(self, request):
-        word_form = WordForm(request.POST)
+        request_body = request.POST
+        request_files = request.FILES
+        word_form = WordForm(request_body, request_files)
         if word_form.is_valid():
             pass
 
