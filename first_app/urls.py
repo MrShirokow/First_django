@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from skyeng.views import ThemeListView, ThemeDetailView, LevelDetailView, CategoryListView, WordDetailView
+from skyeng.views import ThemeListView, ThemeDetailView, LevelDetailView, CategoryListView, WordDetailView, WordListView
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -26,5 +26,6 @@ urlpatterns = [
     path('themes/<int:theme_id>', ThemeDetailView.as_view()),
     path('levels', LevelDetailView.as_view()),
     path('categories', CategoryListView.as_view()),
+    path('words', WordListView.as_view()),
     path('words/<int:word_id>', WordDetailView.as_view()),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

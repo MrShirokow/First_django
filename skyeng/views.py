@@ -6,7 +6,8 @@ from .theme.model import Theme, Level
 from .theme.form import ThemeForm
 from .word.model import Word
 from .word.form import WordForm
-from .serializers import serialize_category_list, serialize_level, serialize_word, serialize_theme, serialize_theme_list
+from .serializers import serialize_category_list, serialize_level, serialize_word, serialize_theme, \
+    serialize_theme_list, serialize_word_list
 from first_app.settings import API_SECRET
 
 
@@ -16,6 +17,7 @@ def api_secret_check(request_function):
         if API_SECRET != secret:
             return HttpResponseForbidden('Unknown API key')
         return request_function(self, request, *args, **kwargs)
+
     return request_wrapper
 
 
@@ -23,7 +25,7 @@ def paginate(query_params, query_set):
     count = query_set.count()
     offset = int(query_params.get('offset', 0))
     limit = int(query_params.get('limit', 50))
-    if limit > 100 or limit < 0 or offset < 0 or offset >= count:
+    if limit > 100 or limit < 0 or offset < 0 or offset > count:
         return None
     return query_set[offset:offset + limit]
 
@@ -35,7 +37,7 @@ class CategoryListView(View):
         query_set = Category.objects.all()
         query_params = request.GET
         query_set = paginate(query_params, query_set)
-        if not query_set:
+        if query_set is None:
             return HttpResponse('Invalid limit or offset value', status=422)
 
         items_data = serialize_category_list(request, query_set)
@@ -43,8 +45,7 @@ class CategoryListView(View):
 
     @api_secret_check
     def post(self, request):
-        category_form = CategoryForm(request.GET)
-        # print(category_form.is_valid())
+        category_form = CategoryForm(request.POST)
         if category_form.is_valid():
             pass
             # name = query_params.get('name')
@@ -70,7 +71,7 @@ class ThemeListView(View):
             query_set = query_set.filter(level=level)
 
         query_set = paginate(query_params, query_set)
-        if not query_set:
+        if query_set is None:
             return HttpResponse('Invalid limit or offset value', status=422)
 
         items_data = serialize_theme_list(request, query_set)
@@ -78,7 +79,7 @@ class ThemeListView(View):
 
     @api_secret_check
     def post(self, request):
-        theme_form = ThemeForm(request.GET)
+        theme_form = ThemeForm(request.POST)
         if theme_form.is_valid():
             pass
 
@@ -117,9 +118,23 @@ class WordDetailView(View):
         item_data = serialize_word(request, word)
         return JsonResponse(item_data)
 
+
+class WordListView(View):
+
+    @api_secret_check
+    def get(self, request):
+        query_set = Word.objects.all()
+        query_params = request.GET
+        query_set = paginate(query_params, query_set)
+        if query_set is None:
+            return HttpResponse('Invalid limit or offset value', status=422)
+
+        items_data = serialize_word_list(query_set)
+        return JsonResponse(items_data, safe=False)
+
     @api_secret_check
     def post(self, request):
-        word_form = WordForm(request.GET)
+        word_form = WordForm(request.POST)
         if word_form.is_valid():
             pass
 

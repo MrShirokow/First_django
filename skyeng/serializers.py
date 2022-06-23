@@ -33,6 +33,14 @@ def serialize_word(request, word):
     return item_data
 
 
+def serialize_word_list(query_set):
+    items_data = [{
+        'id': word.id,
+        'name': word.name} for word in query_set
+    ]
+    return items_data
+
+
 def serialize_theme(request, theme_item, theme_words):
     item_data = {
         'id': theme_item.id,
