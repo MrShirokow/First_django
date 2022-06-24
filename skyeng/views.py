@@ -52,8 +52,9 @@ class CategoryListView(View):
             name = request_body.get('name')
             icon = request_files.get('icon')
             Category.objects.create(name=name, icon=icon)
+            return HttpResponse('Creation is successful', status=201)
 
-        return HttpResponse('Creation was successful', status=201)
+        return HttpResponse('Creation is failed', status=400)
 
 
 class ThemeListView(View):
@@ -82,9 +83,9 @@ class ThemeListView(View):
         request_files = request.FILES
         theme_form = ThemeForm(request_body, request_files)
         if theme_form.is_valid():
-            pass
+            return HttpResponse('Creation is successful', status=201)
 
-        return HttpResponse('Success', status=201)
+        return HttpResponse('Creation is failed', status=400)
 
 
 class ThemeDetailView(View):
@@ -139,6 +140,6 @@ class WordListView(View):
         request_files = request.FILES
         word_form = WordForm(request_body, request_files)
         if word_form.is_valid():
-            pass
+            return HttpResponse('Creation is successful', status=201)
 
-        return HttpResponse('Success', status=201)
+        return HttpResponse('Creation is failed', status=400)
