@@ -1,11 +1,10 @@
 from django import forms
 from .model import Theme
+from skyeng.category.model import Category
 
 
 class ThemeForm(forms.ModelForm):
 
-    category = forms.CharField()
-
     class Meta:
         model = Theme
-        fields = ['level', 'name', 'photo']
+        fields = ['category', 'level', 'name', 'photo']

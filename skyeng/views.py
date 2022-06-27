@@ -1,5 +1,6 @@
 import functools
 import skyeng.serializers as serializers
+import json
 from django.views import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
 from .category.form import CategoryForm
@@ -26,9 +27,9 @@ def paginate(query_params, query_set):
     count = query_set.count()
     offset = int(query_params.get('offset', 0))
     limit = int(query_params.get('limit', 50))
-    if limit > 100 or limit < 0 or offset < 0 or offset > count:
-        return None
-    return query_set[offset:offset + limit]
+    if 0 <= limit <= 100 and 0 <= offset <= count:
+        return query_set[offset:offset + limit]
+    return None
 
 
 class CategoryListView(View):
@@ -46,17 +47,13 @@ class CategoryListView(View):
 
     @api_secret_check
     def post(self, request):
-        request_body = request.POST
-        request_files = request.FILES
-        category_form = CategoryForm(request_body, request_files)
-        if category_form.is_valid():
-            new_category = Category.objects.create()
-            new_category.name = request_body.get('name')
-            new_category.icon = request_files.get('icon')
-            new_category.save()
-            return HttpResponse('Creation is successful', status=201)
+        request_body = json.loads(request.body)
+        category_form = CategoryForm(request_body)
+        if not category_form.is_valid():
+            return HttpResponse('Creation is failed', status=400)
 
-        return HttpResponse('Creation is failed', status=400)
+        Category.objects.create(name=request_body.get('name'))
+        return HttpResponse('Creation is successful', status=201)
 
 
 class ThemeListView(View):
@@ -83,17 +80,19 @@ class ThemeListView(View):
     def post(self, request):
         request_body = request.POST
         request_files = request.FILES
-        theme_form = ThemeForm(request_body, request_files)
-        if theme_form.is_valid():
-            category = Category.objects.filter(name=request_body.get('category')).first()
-            if category:
-                Theme.objects.create(category_id=category.id,
-                                     name=request_body.get('name'),
-                                     level=request_body.get('level'),
-                                     photo=request_files.get('photo'))
-                return HttpResponse('Creation is successful', status=201)
+        theme_form = ThemeForm(request.POST, request.FILES)
+        if not theme_form.is_valid():
+            return HttpResponse('Creation is failed', status=400)
 
-        return HttpResponse('Creation is failed', status=400)
+        category = Category.objects.filter(name=request_body.get('category')).first()
+        if not category:
+            return HttpResponseNotFound(f'Category with name={category} not found')
+
+        Theme.objects.create(category_id=category.id,
+                             name=request_body.get('name'),
+                             level=request_body.get('level'),
+                             photo=request_files.get('photo'))
+        return HttpResponse('Creation is successful', status=201)
 
 
 class ThemeDetailView(View):
@@ -146,15 +145,13 @@ class WordListView(View):
         request_body = request.POST
         request_files = request.FILES
         word_form = WordForm(request_body, request_files)
-        if word_form.is_valid():
-            # theme_id = request_body.get('theme_id')
-            new_word = Word.objects.create()
-            new_word.name = request_body.get('name')
-            new_word.transcription = request_body.get('transcription')
-            new_word.translation = request_body.get('translation')
-            new_word.example = request_body.get('example')
-            new_word.sound = request_files.get('sound')
-            new_word.save()
-            return HttpResponse('Creation is successful', status=201)
+        if not word_form.is_valid():
+            return HttpResponse('Creation is failed', status=400)
 
-        return HttpResponse('Creation is failed', status=400)
+        # theme_id = request_body.get('theme_id')
+        Word.objects.create(name=request_body.get('name'),
+                            transcription=request_body.get('transcription'),
+                            translation=request_body.get('translation'),
+                            example=request_body.get('example'),
+                            sound=request_files.get('sound'))
+        return HttpResponse('Creation is successful', status=201)

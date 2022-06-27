@@ -1,10 +1,8 @@
-from django.forms import ModelForm, ModelChoiceField
+from django import forms
 from .model import Word
 
 
-class WordForm(ModelForm):
-
-    # theme = ModelChoiceField(queryset=Word.objects.all())
+class WordForm(forms.ModelForm):
 
     class Meta:
         model = Word
