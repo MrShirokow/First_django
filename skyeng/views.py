@@ -68,7 +68,7 @@ class ThemeListView(View):
         category_id = query_params.get('category')
         level = query_params.get('level')
         if category_id:
-            query_set = query_set.filter(category=category_id)
+            query_set = query_set.filter(category_id=category_id)
         if level:
             query_set = query_set.filter(level=level)
 
@@ -85,13 +85,13 @@ class ThemeListView(View):
         request_files = request.FILES
         theme_form = ThemeForm(request_body, request_files)
         if theme_form.is_valid():
-            category_id = request_body.get('category_id')
-            new_theme = Theme.objects.create(category_id=category_id)
-            new_theme.name = request_body.get('name')
-            new_theme.level = request_body.get('level')
-            new_theme.photo = request_files.get('photo')
-            new_theme.save()
-            return HttpResponse('Creation is successful', status=201)
+            category = Category.objects.filter(name=request_body.get('category')).first()
+            if category:
+                Theme.objects.create(category_id=category.id,
+                                     name=request_body.get('name'),
+                                     level=request_body.get('level'),
+                                     photo=request_files.get('photo'))
+                return HttpResponse('Creation is successful', status=201)
 
         return HttpResponse('Creation is failed', status=400)
 

@@ -8,4 +8,4 @@ class WordForm(ModelForm):
 
     class Meta:
         model = Word
-        fields = ['name', 'transcription', 'translation', 'example', 'sound']
+        fields = ['theme', 'name', 'transcription', 'translation', 'example', 'sound']

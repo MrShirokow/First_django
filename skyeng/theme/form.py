@@ -1,8 +1,10 @@
-from django.forms import ModelForm
+from django import forms
 from .model import Theme
 
 
-class ThemeForm(ModelForm):
+class ThemeForm(forms.ModelForm):
+
+    category = forms.CharField()
 
     class Meta:
         model = Theme
