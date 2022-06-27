@@ -41,15 +41,15 @@ def serialize_word_list(query_set):
     return items_data
 
 
-def serialize_theme(request, theme_item, theme_words):
+def serialize_theme(request, theme_item):
+    words = theme_item.words.all()
     item_data = {
         'id': theme_item.id,
         'category': theme_item.category.id,
         'level': theme_item.level,
         'name': theme_item.name,
         'photo': request.build_absolute_uri(theme_item.photo.url),
-        'words': [{'id': w.id,
-                   'word': w.name} for w in theme_words]
+        'words': serialize_word_list(words)
     }
     return item_data
 

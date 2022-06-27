@@ -6,4 +6,4 @@ class ThemeForm(ModelForm):
 
     class Meta:
         model = Theme
-        fields = ['category', 'level', 'name', 'photo']
+        fields = ['level', 'name', 'photo']

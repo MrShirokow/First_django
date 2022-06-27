@@ -1,3 +1,5 @@
+import functools
+import skyeng.serializers as serializers
 from django.views import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
 from .category.form import CategoryForm
@@ -6,12 +8,11 @@ from .theme.model import Theme, Level
 from .theme.form import ThemeForm
 from .word.model import Word
 from .word.form import WordForm
-from .serializers import serialize_category_list, serialize_level, serialize_word, serialize_theme, \
-    serialize_theme_list, serialize_word_list
 from first_app.settings import API_SECRET
 
 
 def api_secret_check(request_function):
+    @functools.wraps(request_function)
     def request_wrapper(self, request, *args, **kwargs):
         secret = request.headers.get('SECRET')
         if API_SECRET != secret:
@@ -40,8 +41,8 @@ class CategoryListView(View):
         if query_set is None:
             return HttpResponse('Invalid limit or offset value', status=422)
 
-        items_data = serialize_category_list(request, query_set)
-        return JsonResponse(items_data, safe=False)
+        query_set = serializers.serialize_category_list(request, query_set)
+        return JsonResponse(query_set, safe=False)
 
     @api_secret_check
     def post(self, request):
@@ -49,9 +50,10 @@ class CategoryListView(View):
         request_files = request.FILES
         category_form = CategoryForm(request_body, request_files)
         if category_form.is_valid():
-            name = request_body.get('name')
-            icon = request_files.get('icon')
-            Category.objects.create(name=name, icon=icon)
+            new_category = Category.objects.create()
+            new_category.name = request_body.get('name')
+            new_category.icon = request_files.get('icon')
+            new_category.save()
             return HttpResponse('Creation is successful', status=201)
 
         return HttpResponse('Creation is failed', status=400)
@@ -74,8 +76,8 @@ class ThemeListView(View):
         if query_set is None:
             return HttpResponse('Invalid limit or offset value', status=422)
 
-        items_data = serialize_theme_list(request, query_set)
-        return JsonResponse(items_data, safe=False)
+        query_set = serializers.serialize_theme_list(request, query_set)
+        return JsonResponse(query_set, safe=False)
 
     @api_secret_check
     def post(self, request):
@@ -83,6 +85,12 @@ class ThemeListView(View):
         request_files = request.FILES
         theme_form = ThemeForm(request_body, request_files)
         if theme_form.is_valid():
+            category_id = request_body.get('category_id')
+            new_theme = Theme.objects.create(category_id=category_id)
+            new_theme.name = request_body.get('name')
+            new_theme.level = request_body.get('level')
+            new_theme.photo = request_files.get('photo')
+            new_theme.save()
             return HttpResponse('Creation is successful', status=201)
 
         return HttpResponse('Creation is failed', status=400)
@@ -96,8 +104,7 @@ class ThemeDetailView(View):
         if not theme:
             return HttpResponseNotFound(f'Theme with id={theme_id} not found')
 
-        words = theme.words.all()
-        item_data = serialize_theme(request, theme, words)
+        item_data = serializers.serialize_theme(request, theme)
         return JsonResponse(item_data, safe=False)
 
 
@@ -105,7 +112,7 @@ class LevelDetailView(View):
 
     @api_secret_check
     def get(self, request):
-        items_data = serialize_level(Level)
+        items_data = serializers.serialize_level(Level)
         return JsonResponse(items_data, safe=False)
 
 
@@ -117,7 +124,7 @@ class WordDetailView(View):
         if not word:
             return HttpResponseNotFound(f'Word with id={word_id} not found')
 
-        item_data = serialize_word(request, word)
+        item_data = serializers.serialize_word(request, word)
         return JsonResponse(item_data)
 
 
@@ -131,8 +138,8 @@ class WordListView(View):
         if query_set is None:
             return HttpResponse('Invalid limit or offset value', status=422)
 
-        items_data = serialize_word_list(query_set)
-        return JsonResponse(items_data, safe=False)
+        query_set = serializers.serialize_word_list(query_set)
+        return JsonResponse(query_set, safe=False)
 
     @api_secret_check
     def post(self, request):
@@ -140,6 +147,14 @@ class WordListView(View):
         request_files = request.FILES
         word_form = WordForm(request_body, request_files)
         if word_form.is_valid():
+            # theme_id = request_body.get('theme_id')
+            new_word = Word.objects.create()
+            new_word.name = request_body.get('name')
+            new_word.transcription = request_body.get('transcription')
+            new_word.translation = request_body.get('translation')
+            new_word.example = request_body.get('example')
+            new_word.sound = request_files.get('sound')
+            new_word.save()
             return HttpResponse('Creation is successful', status=201)
 
         return HttpResponse('Creation is failed', status=400)
