@@ -78,20 +78,14 @@ class ThemeListView(View):
 
     @api_secret_check
     def post(self, request):
-        request_body = request.POST
-        request_files = request.FILES
-        theme_form = ThemeForm(request.POST, request.FILES)
+        request_body = json.loads(request.body)
+        theme_form = ThemeForm(request_body)
         if not theme_form.is_valid():
             return HttpResponse('Creation is failed', status=400)
 
-        category = Category.objects.filter(name=request_body.get('category')).first()
-        if not category:
-            return HttpResponseNotFound(f'Category with name={category} not found')
-
-        Theme.objects.create(category_id=category.id,
+        Theme.objects.create(category_id=request_body.get('category'),
                              name=request_body.get('name'),
-                             level=request_body.get('level'),
-                             photo=request_files.get('photo'))
+                             level=request_body.get('level'))
         return HttpResponse('Creation is successful', status=201)
 
 
@@ -142,16 +136,13 @@ class WordListView(View):
 
     @api_secret_check
     def post(self, request):
-        request_body = request.POST
-        request_files = request.FILES
-        word_form = WordForm(request_body, request_files)
+        request_body = json.loads(request.body)
+        word_form = WordForm(request_body)
         if not word_form.is_valid():
             return HttpResponse('Creation is failed', status=400)
 
-        # theme_id = request_body.get('theme_id')
         Word.objects.create(name=request_body.get('name'),
                             transcription=request_body.get('transcription'),
                             translation=request_body.get('translation'),
-                            example=request_body.get('example'),
-                            sound=request_files.get('sound'))
+                            example=request_body.get('example'))
         return HttpResponse('Creation is successful', status=201)

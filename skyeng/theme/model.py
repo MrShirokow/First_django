@@ -14,8 +14,8 @@ class Level(Enum):
 
 
 class Theme(models.Model):
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='themes', blank=True, null=True)
-    level = models.CharField(max_length=30, choices=[(lev.name, lev.value) for lev in Level], blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='themes')
+    level = models.CharField(max_length=30, choices=[(lev.name, lev.value) for lev in Level])
     name = models.CharField(max_length=50, null=True, blank=True)
     photo = models.ImageField(upload_to='images/', null=True, blank=True)
 

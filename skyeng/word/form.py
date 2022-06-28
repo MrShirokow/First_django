@@ -6,4 +6,4 @@ class WordForm(forms.ModelForm):
 
     class Meta:
         model = Word
-        fields = ['theme', 'name', 'transcription', 'translation', 'example', 'sound']
+        fields = ['name', 'transcription', 'translation', 'example', 'sound']
