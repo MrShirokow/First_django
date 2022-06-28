@@ -83,7 +83,11 @@ class ThemeListView(View):
         if not theme_form.is_valid():
             return HttpResponse('Creation is failed', status=400)
 
-        Theme.objects.create(category_id=request_body.get('category'),
+        category_id = request_body.get('category_id')
+        if not Category.objects.filter(pk=category_id).first():
+            return HttpResponseNotFound(f'Category with id={category_id} not found')
+
+        Theme.objects.create(category_id=category_id,
                              name=request_body.get('name'),
                              level=request_body.get('level'))
         return HttpResponse('Creation is successful', status=201)
@@ -141,8 +145,15 @@ class WordListView(View):
         if not word_form.is_valid():
             return HttpResponse('Creation is failed', status=400)
 
-        Word.objects.create(name=request_body.get('name'),
-                            transcription=request_body.get('transcription'),
-                            translation=request_body.get('translation'),
-                            example=request_body.get('example'))
+        theme_ids = request_body.get('themes')
+        themes = Theme.objects.filter(id__in=[theme_id.get('id') for theme_id in theme_ids])
+        if not themes:
+            return HttpResponseNotFound('Themes with such ids not found')
+
+        new_word = Word.objects.create(name=request_body.get('name'),
+                                       transcription=request_body.get('transcription'),
+                                       translation=request_body.get('translation'),
+                                       example=request_body.get('example'))
+        new_word.theme.set(themes)
+        new_word.save()
         return HttpResponse('Creation is successful', status=201)

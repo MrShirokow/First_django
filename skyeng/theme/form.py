@@ -4,7 +4,7 @@ from .model import Theme
 
 class ThemeForm(forms.ModelForm):
 
-    category = forms.IntegerField()
+    category_id = forms.IntegerField()
 
     class Meta:
         model = Theme
