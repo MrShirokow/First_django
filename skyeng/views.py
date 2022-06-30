@@ -1,6 +1,9 @@
 import functools
 import skyeng.serializers as serializers
 import json
+import base64
+import io
+from django.core.files.images import ImageFile
 from django.views import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
 from .category.form import CategoryForm
@@ -9,7 +12,7 @@ from .theme.model import Theme, Level
 from .theme.form import ThemeForm
 from .word.model import Word
 from .word.form import WordForm
-from first_app.settings import API_SECRET
+from config.settings import API_SECRET
 
 
 def api_secret_check(request_function):
@@ -32,6 +35,11 @@ def paginate(query_params, query_set):
     return None
 
 
+def get_file_from_bytes(request_body, name):
+    icon_bytes = base64.b64decode(request_body.get(name))
+    return ImageFile(io.BytesIO(icon_bytes), name='icon.jpg')
+
+
 class CategoryListView(View):
 
     @api_secret_check
@@ -48,11 +56,14 @@ class CategoryListView(View):
     @api_secret_check
     def post(self, request):
         request_body = json.loads(request.body)
-        category_form = CategoryForm(request_body)
+        request_files = {'icon': get_file_from_bytes(request_body, 'icon')}
+        category_form = CategoryForm(request_body, request_files)
+
         if not category_form.is_valid():
             return HttpResponse('Creation is failed', status=400)
 
-        Category.objects.create(name=request_body.get('name'))
+        Category.objects.create(name=request_body.get('name'),
+                                icon=request_files.get('icon'))
         return HttpResponse('Creation is successful', status=201)
 
 
@@ -79,7 +90,8 @@ class ThemeListView(View):
     @api_secret_check
     def post(self, request):
         request_body = json.loads(request.body)
-        theme_form = ThemeForm(request_body)
+        request_files = {'photo': get_file_from_bytes(request_body, 'photo')}
+        theme_form = ThemeForm(request_body, request_files)
         if not theme_form.is_valid():
             return HttpResponse('Creation is failed', status=400)
 
@@ -89,7 +101,8 @@ class ThemeListView(View):
 
         Theme.objects.create(category_id=category_id,
                              name=request_body.get('name'),
-                             level=request_body.get('level'))
+                             level=request_body.get('level'),
+                             photo=request_files.get('photo'))
         return HttpResponse('Creation is successful', status=201)
 
 
