@@ -3,7 +3,7 @@ import skyeng.serializers as serializers
 import json
 import base64
 import io
-from django.core.files.images import ImageFile
+from django.core.files import File
 from django.views import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
 from .category.form import CategoryForm
@@ -35,9 +35,13 @@ def paginate(query_params, query_set):
     return None
 
 
-def get_file_from_bytes(request_body, name):
-    icon_bytes = base64.b64decode(request_body.get(name))
-    return ImageFile(io.BytesIO(icon_bytes), name='icon.jpg')
+def get_file_from_bytes(request_body, json_field_name):
+    file_names = {'icon': 'icon.jpg', 'photo': 'photo.jpg', 'sound': 'sound.mp3'}
+    name = file_names.get(json_field_name)
+    if not name:
+        return None
+    icon_bytes = base64.b64decode(request_body.get(json_field_name))
+    return File(io.BytesIO(icon_bytes), name=name)
 
 
 class CategoryListView(View):
@@ -154,7 +158,8 @@ class WordListView(View):
     @api_secret_check
     def post(self, request):
         request_body = json.loads(request.body)
-        word_form = WordForm(request_body)
+        request_files = {'sound': get_file_from_bytes(request_body, 'sound')}
+        word_form = WordForm(request_body, request_files)
         if not word_form.is_valid():
             return HttpResponse('Creation is failed', status=400)
 
@@ -166,7 +171,8 @@ class WordListView(View):
         new_word = Word.objects.create(name=request_body.get('name'),
                                        transcription=request_body.get('transcription'),
                                        translation=request_body.get('translation'),
-                                       example=request_body.get('example'))
+                                       example=request_body.get('example'),
+                                       sound=request_files.get('sound'))
         new_word.theme.set(themes)
         new_word.save()
         return HttpResponse('Creation is successful', status=201)

@@ -5,11 +5,11 @@ from django.utils.html import mark_safe
 
 class Word(models.Model):
     theme = models.ManyToManyField(Theme, related_name='words', blank=True)
-    name = models.CharField(max_length=200, null=True, blank=True)
-    transcription = models.CharField(max_length=200, null=True, blank=True)
-    translation = models.CharField(max_length=200, null=True, blank=True)
-    example = models.TextField(null=True, blank=True)
-    sound = models.FileField(upload_to='sounds/', blank=True, null=True)
+    name = models.CharField(max_length=200)
+    transcription = models.CharField(max_length=200)
+    translation = models.CharField(max_length=200)
+    example = models.TextField(null=True)
+    sound = models.FileField(upload_to='sounds/', null=True)
 
     @property
     def sound_display(self):
