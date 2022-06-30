@@ -12,7 +12,7 @@ class Category(models.Model):
     @property
     def icon_preview(self):
         if self.icon:
-            return mark_safe(f'<img src="{self.icon.url}" width="100" height="100" />')
+            return mark_safe(f'<img src="{self.icon.url}" width="50" height="50" />')
         return ""
 
     class Meta:

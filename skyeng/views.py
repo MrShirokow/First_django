@@ -1,9 +1,12 @@
-import functools
-import skyeng.serializers as serializers
-import json
 import base64
+import functools
+import json
 import io
+
+import skyeng.serializers as serializers
+
 from django.core.files import File
+from django.core.files.images import ImageFile
 from django.views import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
 from .category.form import CategoryForm
@@ -35,13 +38,8 @@ def paginate(query_params, query_set):
     return None
 
 
-def get_file_from_bytes(request_body, json_field_name):
-    file_names = {'icon': 'icon.jpg', 'photo': 'photo.jpg', 'sound': 'sound.mp3'}
-    name = file_names.get(json_field_name)
-    if not name:
-        return None
-    icon_bytes = base64.b64decode(request_body.get(json_field_name))
-    return File(io.BytesIO(icon_bytes), name=name)
+def decode_file(encoded_data: str):
+    return io.BytesIO(base64.b64decode(encoded_data.encode('utf-8')))
 
 
 class CategoryListView(View):
@@ -60,7 +58,8 @@ class CategoryListView(View):
     @api_secret_check
     def post(self, request):
         request_body = json.loads(request.body)
-        request_files = {'icon': get_file_from_bytes(request_body, 'icon')}
+        file_content = decode_file(request_body.get('icon'))
+        request_files = {'icon': ImageFile(file_content, name='icon.jpg')}
         category_form = CategoryForm(request_body, request_files)
 
         if not category_form.is_valid():
@@ -94,7 +93,9 @@ class ThemeListView(View):
     @api_secret_check
     def post(self, request):
         request_body = json.loads(request.body)
-        request_files = {'photo': get_file_from_bytes(request_body, 'photo')}
+        file_content = decode_file(request_body.get('photo'))
+        request_files = {'photo': ImageFile(file_content, name='photo.jpg')}
+
         theme_form = ThemeForm(request_body, request_files)
         if not theme_form.is_valid():
             return HttpResponse('Creation is failed', status=400)
@@ -158,7 +159,8 @@ class WordListView(View):
     @api_secret_check
     def post(self, request):
         request_body = json.loads(request.body)
-        request_files = {'sound': get_file_from_bytes(request_body, 'sound')}
+        file_content = decode_file(request_body.get('sound'))
+        request_files = {'sound': File(file_content, name='sound.mp3')}
         word_form = WordForm(request_body, request_files)
         if not word_form.is_valid():
             return HttpResponse('Creation is failed', status=400)

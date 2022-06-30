@@ -22,7 +22,7 @@ class Theme(models.Model):
     @property
     def photo_preview(self):
         if self.photo:
-            return mark_safe(f'<img src="{self.photo.url}" width="100" height="100" />')
+            return mark_safe(f'<img src="{self.photo.url}" width="50" height="50" />')
         return ""
 
     def __str__(self):
