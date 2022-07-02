@@ -11,4 +11,4 @@ WORKDIR /usr/src/app/
 RUN pip install --upgrade pip==22.1.2 && pip install -r requirements.txt
 
 # runserver
-ENTRYPOINT ["python", "manage.py", "runserver"]
+# ENTRYPOINT ["python", "manage.py", "runserver"]
