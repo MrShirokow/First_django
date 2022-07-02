@@ -1,10 +1,10 @@
 all: makemigrations migrate run
 
-run:
-	python3.10 manage.py runserver
-
 makemigrations:
-	python3.10 manage.py makemigrations
+	python manage.py makemigrations
 
 migrate:
-	python3.10 manage.py migrate
+	docker exec first_django_web_1 python manage.py migrate
+
+run:
+	docker-compose up
