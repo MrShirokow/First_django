@@ -6,5 +6,11 @@ makemigrations:
 migrate:
 	docker exec first_django_web_1 python manage.py migrate
 
-run:
+up:
 	docker-compose up
+
+down:
+	docker-compose down
+
+build:
+	docker-compose build

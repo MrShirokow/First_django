@@ -8,6 +8,7 @@ import io
 import skyeng.serializers as serializers
 
 from django.core.files import File
+from django.db import connection
 from django.core.files.images import ImageFile
 from django.views import View
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
@@ -57,7 +58,9 @@ class CategoryListView(View):
         query_params = request.GET
         query_set = paginate(query_params, query_set)
         if query_set is None:
-            return HttpResponse('Invalid limit or offset value', status=422)
+            return HttpResponse(f'Invalid limit or offset value. '
+                                f'Expected values are limit from 0 to 100 and offset from 0 to query set count',
+                                status=422)
 
         query_set = serializers.serialize_category_list(request, query_set)
         return JsonResponse(query_set, safe=False)
@@ -92,7 +95,9 @@ class ThemeListView(View):
 
         query_set = paginate(query_params, query_set)
         if query_set is None:
-            return HttpResponse('Invalid limit or offset value', status=422)
+            return HttpResponse(f'Invalid limit or offset value. '
+                                f'Expected values are limit from 0 to 100 and offset from 0 to query set count',
+                                status=422)
 
         query_set = serializers.serialize_theme_list(request, query_set)
         return JsonResponse(query_set, safe=False)
@@ -159,7 +164,9 @@ class WordListView(View):
         query_params = request.GET
         query_set = paginate(query_params, query_set)
         if query_set is None:
-            return HttpResponse('Invalid limit or offset value', status=422)
+            return HttpResponse(f'Invalid limit or offset value. '
+                                f'Expected values are limit from 0 to 100 and offset from 0 to query set count',
+                                status=422)
 
         query_set = serializers.serialize_word_list(query_set)
         return JsonResponse(query_set, safe=False)
@@ -182,7 +189,9 @@ class WordListView(View):
                                        transcription=request_body.get('transcription'),
                                        translation=request_body.get('translation'),
                                        example=request_body.get('example'),
-                                       sound=request_files.get('sound'))
-        new_word.theme.set(themes)
-        new_word.save()
+                                       sound=request_files.get('sound')
+                                       )
+        new_word.theme.add(*themes)
+        print(len(connection.queries))
+
         return HttpResponse('Creation is successful', status=201)
