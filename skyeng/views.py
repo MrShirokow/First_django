@@ -1,5 +1,7 @@
 import base64
 import functools
+import hashlib
+import hmac
 import json
 import io
 
@@ -22,11 +24,16 @@ def api_secret_check(request_function):
     @functools.wraps(request_function)
     def request_wrapper(self, request, *args, **kwargs):
         secret = request.headers.get('SECRET')
-        if API_SECRET != secret:
+        if get_signature(request, secret) != get_signature(request, API_SECRET):
             return HttpResponseForbidden('Unknown API key')
         return request_function(self, request, *args, **kwargs)
 
     return request_wrapper
+
+
+def get_signature(request, key):
+    request_str = f'{request.method}\n{request.path}'
+    return hmac.new(key.encode(), request_str.encode(), hashlib.sha256).hexdigest()
 
 
 def paginate(query_params, query_set):
@@ -119,7 +126,8 @@ class ThemeDetailView(View):
         if not theme:
             return HttpResponseNotFound(f'Theme with id={theme_id} not found')
 
-        item_data = serializers.serialize_theme(request, theme)
+        words = theme.words.all()
+        item_data = serializers.serialize_theme(request, theme, words)
         return JsonResponse(item_data, safe=False)
 
 
