@@ -8,9 +8,9 @@ import io
 import skyeng.serializers as serializers
 
 from django.core.files import File
-from django.db import connection
 from django.core.files.images import ImageFile
 from django.views import View
+from django.db import connection
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
 from .category.form import CategoryForm
 from .category.model import Category
@@ -22,6 +22,7 @@ from config.settings import API_SECRET
 
 
 def api_secret_check(request_function):
+
     @functools.wraps(request_function)
     def request_wrapper(self, request, *args, **kwargs):
         secret = request.headers.get('SECRET')
@@ -180,8 +181,9 @@ class WordListView(View):
         if not word_form.is_valid():
             return HttpResponse('Creation is failed', status=400)
 
-        theme_ids = request_body.get('themes')
-        themes = Theme.objects.filter(id__in=[theme_id.get('id') for theme_id in theme_ids])
+        request_ids = [theme_id.get('id') for theme_id in request_body.get('themes')]
+        themes = Theme.objects.filter(id__in=request_ids)
+
         if not themes:
             return HttpResponseNotFound('Themes with such ids not found')
 
@@ -191,7 +193,6 @@ class WordListView(View):
                                        example=request_body.get('example'),
                                        sound=request_files.get('sound')
                                        )
-        new_word.theme.add(*themes)
-        print(len(connection.queries))
+        new_word.themes.add(*themes)
 
         return HttpResponse('Creation is successful', status=201)
