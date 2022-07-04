@@ -25,8 +25,7 @@ def api_secret_check(request_function):
 
     @functools.wraps(request_function)
     def request_wrapper(self, request, *args, **kwargs):
-        secret = request.headers.get('SECRET')
-        if get_signature(request, secret) != get_signature(request, API_SECRET):
+        if request.headers.get('X-Signature') != get_signature(request, API_SECRET):
             return HttpResponseForbidden('Unknown API key')
         return request_function(self, request, *args, **kwargs)
 
