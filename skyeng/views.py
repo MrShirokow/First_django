@@ -190,8 +190,7 @@ class WordListView(View):
                                        transcription=request_body.get('transcription'),
                                        translation=request_body.get('translation'),
                                        example=request_body.get('example'),
-                                       sound=request_files.get('sound')
-                                       )
+                                       sound=request_files.get('sound'))
         new_word.themes.add(*themes)
 
         return HttpResponse('Creation is successful', status=201)
