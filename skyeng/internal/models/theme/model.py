@@ -1,6 +1,6 @@
 from django.db import models
 from enum import Enum
-from skyeng.category.model import Category
+from skyeng.internal.models.category.model import Category
 from django.utils.html import mark_safe
 
 

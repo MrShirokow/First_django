@@ -1,5 +1,5 @@
 from django.db import models
-from skyeng.theme.model import Theme
+from skyeng.internal.models.theme.model import Theme
 from django.utils.html import mark_safe
 
 

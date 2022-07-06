@@ -14,18 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from skyeng.views import ThemeListView, ThemeDetailView, LevelDetailView, CategoryListView, WordDetailView, WordListView
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
-
+from skyeng.internal import urls
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('themes', ThemeListView.as_view()),
-    path('themes/<int:theme_id>', ThemeDetailView.as_view()),
-    path('levels', LevelDetailView.as_view()),
-    path('categories', CategoryListView.as_view()),
-    path('words', WordListView.as_view()),
-    path('words/<int:word_id>', WordDetailView.as_view()),
+    re_path(r'^admin/?', admin.site.urls),
+    path('', include(urls.urlpatterns))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

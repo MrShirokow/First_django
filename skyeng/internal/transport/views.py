@@ -5,19 +5,18 @@ import hmac
 import json
 import io
 
-import skyeng.serializers as serializers
+import skyeng.internal.services.serializers as serializers
 
 from django.core.files import File
 from django.core.files.images import ImageFile
 from django.views import View
-from django.db import connection
 from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
-from .category.form import CategoryForm
-from .category.model import Category
-from .theme.model import Theme, Level
-from .theme.form import ThemeForm
-from .word.model import Word
-from .word.form import WordForm
+from skyeng.internal.models.category.form import CategoryForm
+from skyeng.internal.models.category.model import Category
+from skyeng.internal.models.theme.model import Theme, Level
+from skyeng.internal.models.theme.form import ThemeForm
+from skyeng.internal.models.word.model import Word
+from skyeng.internal.models.word.form import WordForm
 from config.settings import API_SECRET
 
 
@@ -78,13 +77,7 @@ class CategoryListView(View):
     def get(self, request):
         query_set = Category.objects.all()
         query_params = request.GET
-        query_set = paginate(query_params, query_set)
-        if query_set is None:
-            return HttpResponse(f'Invalid limit or offset value. '
-                                f'Expected values: non-negative offset and limit from 0 to 100',
-                                status=422)
-
-        query_set = serializers.serialize_category_list(request, query_set)
+        query_set = serializers.serialize_category_list(request, paginate(query_params, query_set))
         return JsonResponse(query_set, safe=False)
 
     @api_secret_check
@@ -115,13 +108,7 @@ class ThemeListView(View):
         if level:
             query_set = query_set.filter(level=level)
 
-        query_set = paginate(query_params, query_set)
-        if query_set is None:
-            return HttpResponse(f'Invalid limit or offset value. '
-                                f'Expected values are limit from 0 to 100 and offset from 0 to query set count',
-                                status=422)
-
-        query_set = serializers.serialize_theme_list(request, query_set)
+        query_set = serializers.serialize_theme_list(request, paginate(query_params, query_set))
         return JsonResponse(query_set, safe=False)
 
     @api_secret_check
@@ -184,13 +171,7 @@ class WordListView(View):
     def get(self, request):
         query_set = Word.objects.all()
         query_params = request.GET
-        query_set = paginate(query_params, query_set)
-        if query_set is None:
-            return HttpResponse(f'Invalid limit or offset value. '
-                                f'Expected values are limit from 0 to 100 and offset from 0 to query set count',
-                                status=422)
-
-        query_set = serializers.serialize_word_list(query_set)
+        query_set = serializers.serialize_word_list(paginate(query_params, query_set))
         return JsonResponse(query_set, safe=False)
 
     @api_secret_check
