@@ -22,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 env = environ.Env(
-    DB_ENGINE=(str, ''),
-    DB_NAME=(str, ''),
-    DB_USER=(str, ''),
-    DB_PASSWORD=(str, ''),
-    DB_HOST=(str, ''),
-    DB_PORT=(str, ''),
+    POSTGRES_ENGINE=(str, ''),
+    POSTGRES_DB=(str, ''),
+    POSTGRES_USER=(str, ''),
+    POSTGRES_PASSWORD=(str, ''),
+    POSTGRES_HOST=(str, ''),
+    POSTGRES_PORT=(str, ''),
     SECRET_KEY=(str, ''),
     DEBUG=(bool, False),
     API_SECRET=(str, '')
@@ -93,12 +93,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': env('DB_ENGINE'),
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT')
+        'ENGINE': env('POSTGRES_ENGINE'),
+        'NAME': env('POSTGRES_DB'),
+        'USER': env('POSTGRES_USER'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': env('POSTGRES_HOST'),
+        'PORT': env('POSTGRES_PORT')
     }
 }
 

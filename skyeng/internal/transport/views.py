@@ -136,11 +136,11 @@ class ThemeDetailView(View):
 
     @api_secret_check
     def get(self, request, theme_id):
-        theme = Theme.objects.filter(id=theme_id).first()
+        theme = Theme.objects.filter(id=theme_id).first()       # prefetch
         if not theme:
             return HttpResponseNotFound(f'Theme with id={theme_id} not found')
 
-        words = theme.words.all()
+        words = theme.words.all()   # Delete
         item_data = serializers.serialize_theme(request, theme, words)
         return JsonResponse(item_data, safe=False)
 
