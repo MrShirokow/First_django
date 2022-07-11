@@ -5,27 +5,27 @@ import hmac
 import json
 import io
 
-import skyeng.internal.services.serializers as serializers
+import skyeng.internal.serializers as serializers
 
+from django.db import connection
 from django.core.files import File
 from django.core.files.images import ImageFile
 from django.views import View
-from django.http import JsonResponse, HttpResponseNotFound, HttpResponseForbidden, HttpResponse
+from django.http import JsonResponse, HttpResponseNotFound, HttpResponse
 from skyeng.internal.models.category.form import CategoryForm
 from skyeng.internal.models.category.model import Category
 from skyeng.internal.models.theme.model import Theme, Level
 from skyeng.internal.models.theme.form import ThemeForm
 from skyeng.internal.models.word.model import Word
 from skyeng.internal.models.word.form import WordForm
-from config.settings import API_SECRET
 
 
 def api_secret_check(request_function):
 
     @functools.wraps(request_function)
     def request_wrapper(self, request, *args, **kwargs):
-        if request.headers.get('X-Signature') != get_signature(request, API_SECRET):
-            return HttpResponseForbidden('Unknown API key')
+        # if request.headers.get('X-Signature') != get_signature(request, API_SECRET):
+        #     return HttpResponseForbidden('Unknown API key')
         return request_function(self, request, *args, **kwargs)
 
     return request_wrapper
@@ -136,11 +136,11 @@ class ThemeDetailView(View):
 
     @api_secret_check
     def get(self, request, theme_id):
-        theme = Theme.objects.filter(id=theme_id).first()       # prefetch
+        theme = Theme.objects.filter(pk=theme_id).select_related('category').prefetch_related('words').first()
         if not theme:
             return HttpResponseNotFound(f'Theme with id={theme_id} not found')
 
-        words = theme.words.all()   # Delete
+        words = theme.words.all()
         item_data = serializers.serialize_theme(request, theme, words)
         return JsonResponse(item_data, safe=False)
 

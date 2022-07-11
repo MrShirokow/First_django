@@ -1,5 +1,5 @@
 from django.urls import re_path
-from skyeng.internal.transport.views import ThemeListView, ThemeDetailView, LevelDetailView, CategoryListView, WordDetailView, WordListView
+from skyeng.internal.views import ThemeListView, ThemeDetailView, LevelDetailView, CategoryListView, WordDetailView, WordListView
 
 
 urlpatterns = [
