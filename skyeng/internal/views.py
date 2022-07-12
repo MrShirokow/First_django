@@ -18,14 +18,12 @@ from skyeng.internal.models.word.form import WordForm
 
 class CategoryListView(View):
 
-    @utils.api_secret_check
     def get(self, request):
         query_set = Category.objects.all()
         query_params = request.GET
         query_set = serializers.serialize_category_list(request, utils.paginate(query_params, query_set))
         return JsonResponse(query_set, safe=False)
 
-    @utils.api_secret_check
     def post(self, request):
         request_body = json.loads(request.body)
         file_content = utils.decode_file(request_body.get('icon'))
@@ -42,7 +40,6 @@ class CategoryListView(View):
 
 class ThemeListView(View):
 
-    @utils.api_secret_check
     def get(self, request):
         query_params = request.GET
         query_set = Theme.objects.all()
@@ -56,7 +53,6 @@ class ThemeListView(View):
         query_set = serializers.serialize_theme_list(request, utils.paginate(query_params, query_set))
         return JsonResponse(query_set, safe=False)
 
-    @utils.api_secret_check
     def post(self, request):
         request_body = json.loads(request.body)
         file_content = utils.decode_file(request_body.get('photo'))
@@ -79,7 +75,6 @@ class ThemeListView(View):
 
 class ThemeDetailView(View):
 
-    @utils.api_secret_check
     def get(self, request, theme_id):
         theme = Theme.objects.filter(pk=theme_id).select_related('category').prefetch_related('words').first()
         if not theme:
@@ -92,7 +87,6 @@ class ThemeDetailView(View):
 
 class LevelDetailView(View):
 
-    @utils.api_secret_check
     def get(self, request):
         items_data = serializers.serialize_level(Level)
         return JsonResponse(items_data, safe=False)
@@ -100,7 +94,6 @@ class LevelDetailView(View):
 
 class WordDetailView(View):
 
-    @utils.api_secret_check
     def get(self, request, word_id):
         word = Word.objects.filter(id=word_id).first()
         if not word:
@@ -112,14 +105,12 @@ class WordDetailView(View):
 
 class WordListView(View):
 
-    @utils.api_secret_check
     def get(self, request):
         query_set = Word.objects.all()
         query_params = request.GET
         query_set = serializers.serialize_word_list(utils.paginate(query_params, query_set))
         return JsonResponse(query_set, safe=False)
 
-    @utils.api_secret_check
     def post(self, request):
         request_body = json.loads(request.body)
         file_content = utils.decode_file(request_body.get('sound'))

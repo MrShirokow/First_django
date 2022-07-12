@@ -1,22 +1,7 @@
 import base64
-import functools
 import hashlib
 import hmac
 import io
-
-from django.http import HttpResponseForbidden
-from config.settings import API_SECRET
-
-
-def api_secret_check(request_function):
-
-    @functools.wraps(request_function)
-    def request_wrapper(self, request, *args, **kwargs):
-        if request.headers.get('X-Signature') != get_signature(request, API_SECRET):
-            return HttpResponseForbidden('Unknown API key')
-        return request_function(self, request, *args, **kwargs)
-
-    return request_wrapper
 
 
 def get_signature(request, key):
