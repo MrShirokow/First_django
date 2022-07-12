@@ -4,6 +4,9 @@ import hashlib
 import hmac
 import io
 
+from django.http import HttpResponseForbidden
+from config.settings import API_SECRET
+
 
 def api_secret_check(request_function):
 

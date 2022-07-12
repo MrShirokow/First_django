@@ -1,6 +1,9 @@
-import csv
 from django.contrib import admin
-from skyeng.models import Category, Theme, Word
+from skyeng.models import Category, Theme, Word, User
+from django.contrib.auth.admin import UserAdmin
+
+
+admin.site.register(User, UserAdmin)
 
 
 @admin.register(Category)
@@ -8,13 +11,6 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'icon_preview')
     readonly_fields = ('icon_preview',)
     list_display_links = ('id', 'name')
-
-    def export_to_csv(self, request, queryset):
-        with open('data.csv', 'w') as f:
-            writer = csv.writer(f)
-            writer.writerow(['id', 'name'])
-            for category in queryset:
-                writer.writerow([category.id, category.name])
 
     def icon_preview(self, item):
         return item.icon_preview
