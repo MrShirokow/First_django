@@ -3,7 +3,7 @@ from django.db import models
 
 
 class User(AbstractUser):
-    # repeat_words = models.IntegerField(null=True)
+    word_counter = models.IntegerField(null=True, default=0)
 
     def __str__(self):
         return self.username

@@ -3,7 +3,10 @@ from skyeng.models import Category, Theme, Word, User
 from django.contrib.auth.admin import UserAdmin
 
 
-admin.site.register(User, UserAdmin)
+@admin.register(User)
+class MyUserAdmin(UserAdmin):
+    list_display = ("id", "word_counter", "username", "email", "first_name", "last_name", "is_staff")
+    list_display_links = ('id', 'username', 'email')
 
 
 @admin.register(Category)
