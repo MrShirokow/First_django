@@ -1,4 +1,4 @@
-all: makemigrations migrate run
+all: makemigrations migrate up
 
 makemigrations:
 	python manage.py makemigrations
@@ -14,3 +14,13 @@ down:
 
 build:
 	docker-compose build
+
+superuser:
+	docker exec -it 20be1f0231d6 python manage.py createsuperuser
+
+cronadd:
+	docker exec -it 20be1f0231d6 python manage.py crontab add
+cronshow:
+	docker exec -it 20be1f0231d6 python manage.py crontab show
+cronremove:
+	docker exec -it 20be1f0231d6 python manage.py crontab remove
