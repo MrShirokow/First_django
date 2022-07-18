@@ -1,4 +1,4 @@
-from django.core.handlers.wsgi import WSGIRequest
+from django.http import HttpRequest
 from django.http import HttpResponseForbidden
 
 from config.settings import API_SECRET
@@ -12,7 +12,7 @@ class ApiSecretMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
-    def __call__(self, request: WSGIRequest):
+    def __call__(self, request: HttpRequest):
         if request.path.startswith('/api/'):
             if request.headers.get('X-Signature') != utils.get_signature(request, API_SECRET):
                 return HttpResponseForbidden('Unknown API key')

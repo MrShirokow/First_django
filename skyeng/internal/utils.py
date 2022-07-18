@@ -3,13 +3,16 @@ import hashlib
 import hmac
 import io
 
+from django.db.models import QuerySet
+from django.http import HttpRequest, QueryDict
 
-def get_signature(request, key):
+
+def get_signature(request: HttpRequest, key: str):
     request_str = f'{request.method}\n{request.path}'
     return hmac.new(key.encode(), request_str.encode(), hashlib.sha256).hexdigest()
 
 
-def positive_int(integer_string, strict=False, cutoff=None):
+def positive_int(integer_string: str, strict=False, cutoff=None):
     number = int(integer_string)
     if number < 0 or (number == 0 and strict):
         raise ValueError()
@@ -18,7 +21,7 @@ def positive_int(integer_string, strict=False, cutoff=None):
     return number
 
 
-def get_limit(query_params, default=50):
+def get_limit(query_params: QueryDict, default: int = 50):
     try:
         return positive_int(query_params.get('limit'),
                             strict=True,
@@ -27,14 +30,14 @@ def get_limit(query_params, default=50):
         return default
 
 
-def get_offset(query_params):
+def get_offset(query_params: QueryDict):
     try:
         return positive_int(query_params.get('offset'))
     except (TypeError, ValueError):
         return 0
 
 
-def paginate(query_params, query_set):
+def paginate(query_params: QueryDict, query_set: QuerySet):
     offset = get_offset(query_params)
     limit = get_limit(query_params)
     return query_set[offset:offset + limit]

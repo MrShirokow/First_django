@@ -4,27 +4,27 @@ import skyeng.internal.serializers as serializers
 import skyeng.internal.utils as utils
 
 from django.db import connection
+from django.views import View
 from django.core.files import File
 from django.core.files.images import ImageFile
-from django.views import View
-from django.http import JsonResponse, HttpResponseNotFound, HttpResponse
 from skyeng.internal.models.category.form import CategoryForm
 from skyeng.internal.models.category.model import Category
 from skyeng.internal.models.theme.model import Theme, Level
 from skyeng.internal.models.theme.form import ThemeForm
 from skyeng.internal.models.word.model import Word
 from skyeng.internal.models.word.form import WordForm
+from django.http import HttpRequest, JsonResponse, HttpResponseNotFound, HttpResponse
 
 
 class CategoryListView(View):
 
-    def get(self, request):
+    def get(self, request: HttpRequest) -> JsonResponse:
         query_set = Category.objects.all()
         query_params = request.GET
         query_set = serializers.serialize_category_list(request, utils.paginate(query_params, query_set))
         return JsonResponse(query_set, safe=False)
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         request_body = json.loads(request.body)
         file_content = utils.decode_file(request_body.get('icon'))
         request_files = {'icon': ImageFile(file_content, name='icon.jpg')}
@@ -40,7 +40,7 @@ class CategoryListView(View):
 
 class ThemeListView(View):
 
-    def get(self, request):
+    def get(self, request: HttpRequest) -> JsonResponse:
         query_params = request.GET
         query_set = Theme.objects.all()
         category_id = query_params.get('category')
@@ -53,7 +53,7 @@ class ThemeListView(View):
         query_set = serializers.serialize_theme_list(request, utils.paginate(query_params, query_set))
         return JsonResponse(query_set, safe=False)
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         request_body = json.loads(request.body)
         file_content = utils.decode_file(request_body.get('photo'))
         request_files = {'photo': ImageFile(file_content, name='photo.jpg')}
@@ -75,7 +75,7 @@ class ThemeListView(View):
 
 class ThemeDetailView(View):
 
-    def get(self, request, theme_id):
+    def get(self, request: HttpRequest, theme_id: int) -> JsonResponse | HttpResponseNotFound:
         theme = Theme.objects.filter(pk=theme_id).select_related('category').prefetch_related('words').first()
         if not theme:
             return HttpResponseNotFound(f'Theme with id={theme_id} not found')
@@ -87,14 +87,14 @@ class ThemeDetailView(View):
 
 class LevelDetailView(View):
 
-    def get(self, request):
+    def get(self, request: HttpRequest) -> JsonResponse:
         items_data = serializers.serialize_level(Level)
         return JsonResponse(items_data, safe=False)
 
 
 class WordDetailView(View):
 
-    def get(self, request, word_id):
+    def get(self, request: HttpRequest, word_id: int) -> JsonResponse | HttpResponseNotFound:
         word = Word.objects.filter(id=word_id).first()
         if not word:
             return HttpResponseNotFound(f'Word with id={word_id} not found')
@@ -105,13 +105,13 @@ class WordDetailView(View):
 
 class WordListView(View):
 
-    def get(self, request):
+    def get(self, request: HttpRequest) -> JsonResponse:
         query_set = Word.objects.all()
         query_params = request.GET
         query_set = serializers.serialize_word_list(utils.paginate(query_params, query_set))
         return JsonResponse(query_set, safe=False)
 
-    def post(self, request):
+    def post(self, request: HttpRequest) -> HttpResponse:
         request_body = json.loads(request.body)
         file_content = utils.decode_file(request_body.get('sound'))
         request_files = {'sound': File(file_content, name='sound.mp3')}

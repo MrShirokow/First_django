@@ -1,10 +1,10 @@
-from django.core.handlers.wsgi import WSGIRequest
+from django.http import HttpRequest
 from django.db.models import QuerySet
 from skyeng.internal.models.theme.model import Level, Theme
 from skyeng.internal.models.word.model import Word
 
 
-def serialize_category_list(request: WSGIRequest, query_set: QuerySet) -> list:
+def serialize_category_list(request: HttpRequest, query_set: QuerySet) -> list:
     """
     The function serializes the category queryset and returns as a list
     """
@@ -25,7 +25,7 @@ def serialize_level(levels: Level) -> list:
     ]
 
 
-def serialize_word(request: WSGIRequest, word: Word) -> dict:
+def serialize_word(request: HttpRequest, word: Word) -> dict:
     """
     The function serializes the 'Word' object and returns it as a dictionary of word's fields
     """
@@ -49,7 +49,7 @@ def serialize_word_list(query_set: QuerySet) -> list:
     ]
 
 
-def serialize_theme(request: WSGIRequest, theme_item: Theme, words: QuerySet) -> dict:
+def serialize_theme(request: HttpRequest, theme_item: Theme, words: QuerySet) -> dict:
     """
     The function serializes the 'Theme' object and returns it as a dictionary of theme's fields
     """
@@ -63,7 +63,7 @@ def serialize_theme(request: WSGIRequest, theme_item: Theme, words: QuerySet) ->
     }
 
 
-def serialize_theme_list(request: WSGIRequest, query_set: QuerySet) -> list:
+def serialize_theme_list(request: HttpRequest, query_set: QuerySet) -> list:
     """
     The function serializes the theme queryset and returns as a list
     """
