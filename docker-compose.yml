@@ -16,6 +16,12 @@ services:
       - ${PORT}:8000
     depends_on:
       - db
+  cron:
+    build: .
+    env_file: ./.env
+    depends_on:
+      - db
+    command: cron -f
 volumes:
   db_volume:
   static_volume:

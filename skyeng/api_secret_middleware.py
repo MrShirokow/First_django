@@ -1,5 +1,4 @@
-from django.http import HttpRequest
-from django.http import HttpResponseForbidden
+from django.http import HttpRequest, HttpResponseForbidden
 
 from config.settings import API_SECRET
 from skyeng.internal import utils

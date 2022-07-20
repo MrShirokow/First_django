@@ -15,12 +15,17 @@ down:
 build:
 	docker-compose build
 
+imageprune:
+	docker image prune -f
+
 superuser:
-	docker exec -it 20be1f0231d6 python manage.py createsuperuser
+	docker exec -it first_django_web_1 python manage.py createsuperuser
 
 cronadd:
-	docker exec -it 20be1f0231d6 python manage.py crontab add
+	docker exec -it first_django_cron_1 python manage.py crontab add
+
 cronshow:
-	docker exec -it 20be1f0231d6 python manage.py crontab show
+	docker exec -it first_django_cron_1 python manage.py crontab show
+
 cronremove:
-	docker exec -it 20be1f0231d6 python manage.py crontab remove
+	docker exec -it first_django_cron_1 python manage.py crontab remove
