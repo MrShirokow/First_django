@@ -22,10 +22,10 @@ superuser:
 	docker exec -it first_django_web_1 python manage.py createsuperuser
 
 cronadd:
-	docker exec -it first_django_cron_1 python manage.py crontab add
+	(crontab -l ; echo "*/1 * * * * docker exec first_django_web_1 bash ./cron.sh") | crontab -
 
 cronshow:
-	docker exec -it first_django_cron_1 python manage.py crontab show
+	crontab -l
 
 cronremove:
-	docker exec -it first_django_cron_1 python manage.py crontab remove
+	crontab -r

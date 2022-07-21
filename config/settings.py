@@ -61,7 +61,7 @@ INSTALLED_APPS = [
 ]
 
 CRONJOBS = [
-    ('* */2 * * *', 'skyeng.cron.update_word_count')
+    ('*/1 * * * *', 'skyeng.cron.update_word_count')
 ]
 
 AUTH_USER_MODEL = 'skyeng.User'
